@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ali Raza Syed</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  font-family:"Geist",sans-serif;line-height:1.5;scroll-behavior:smooth;
+  color:#eae5ec;background-color:var(--backgroundColor);
+  text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;
+  user-select:none;-webkit-user-select:none;
+  --accentColor:#c2a4ff;--backgroundColor:#0b080c;--vh:100svh;
+}
+h1,h2,h3,h4,h5,h6{font-family:"Geist",sans-serif}
+body{margin:0;background-color:#000;--cWidth:calc(100% - 30px);--cMaxWidth:1920px;max-width:100vw;overflow-x:hidden}
+a{color:inherit;text-decoration:inherit}
+a:hover{color:var(--accentColor)}
+
+/* CURSOR */
+.cursor-main{--size:0px;position:fixed;top:calc(var(--size)/-2);left:calc(var(--size)/-2);width:var(--size);height:var(--size);border-radius:50px;pointer-events:none;z-index:99999;background-color:#e6c3ff;box-shadow:0 0 30px 0 rgb(175,131,255);mix-blend-mode:difference;transition:top .3s ease-out,left .3s ease-out,width .3s ease-out,height .3s ease-out}
+.cursor-icons{top:10px!important;left:10px!important;height:calc(var(--cursorH) - 20px)!important;transition:all .5s ease-out,height .5s ease-in-out!important}
+.cursor-disable{--size:0px!important}
+@media(min-width:600px){.cursor-main{--size:50px}}
+
+/* LOADING */
+#loading-screen{position:fixed;width:100vw;height:var(--vh);background-color:#eae5ec;z-index:999999999;display:flex;place-items:center;justify-content:center;overflow:hidden}
+.loading-header{width:var(--cWidth);max-width:var(--cMaxWidth);position:fixed;z-index:9999999999;display:flex;justify-content:space-between;box-sizing:border-box;padding:20px 0;left:50%;transform:translateX(-50%);top:0;color:#000}
+.loader-title{font-weight:700;font-size:14px;letter-spacing:.2px;color:#000}
+.loaderGame-container{width:200px;height:100px;overflow:hidden;position:relative;transform:scale(0.4);transform-origin:top right;transition:.3s}
+.loader-out .loaderGame-container{opacity:0}
+.loaderGame-in{width:1200px;position:absolute;overflow:hidden;left:0;animation:loaderGame 7s linear infinite}
+@keyframes loaderGame{0%{transform:translateX(0)}100%{transform:translateX(-300px)}}
+.loaderGame-line{float:left;margin:0 20px;margin-bottom:40px;position:relative;width:10px;height:60px;background-color:#000;display:block}
+.loaderGame-line:nth-child(2n){margin-top:40px;margin-bottom:0}
+.loaderGame-ball{position:absolute;left:20%;top:0;width:15px;height:15px;border-radius:50%;background-color:#a87cff;animation:ball25 7s infinite;transform:translateY(10px);animation-timing-function:cubic-bezier(.3,1.18,.63,1.28)}
+@keyframes ball25{0%,30%,67%,90%,100%{transform:translateY(70px)}15%,45%,80%{transform:translateY(10px)}}
+.loading-marquee{position:absolute;top:50%;left:0;width:100%;transform:translateY(-50%);color:#0b080c;font-size:60px;font-weight:600;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.marquee-track{display:inline-block;animation:marqueeAnim 10s linear infinite;white-space:nowrap}
+@keyframes marqueeAnim{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.marquee-track span{padding:0 50px;position:relative}
+.marquee-track span::before{content:"";width:20px;height:20px;background-color:#0b080c;position:absolute;top:50%;border-radius:50px;left:0;transform:translate(-50%,-50%)}
+.loading-wrap{--Lsize:145px;padding:6px;position:relative;min-width:0;min-height:0;border-radius:100px;background-color:#000;overflow:hidden;transition:.8s ease-in-out;transition-delay:.2s;box-shadow:0 15px 15px rgba(0,0,0,.2);display:flex;justify-content:center;align-items:center;cursor:pointer}
+.loading-clicked{transition-delay:0ms;transition-timing-function:cubic-bezier(.33,.11,1,.72);min-width:calc(100vw + 5000px);border-radius:5000px;min-height:calc(100vh + 500px);box-shadow:none}
+.loading-clicked .loading-button{overflow:visible}
+.loading-hover{background-color:#a87cff;width:250px;height:120px;position:absolute;top:var(--mouse-y,50%);left:var(--mouse-x,50%);border-radius:50%;transform:translate(-50%,-50%);filter:blur(30px);opacity:0;transition:opacity 500ms}
+.loading-wrap:hover .loading-hover{opacity:1}
+.loading-clicked .loading-hover{opacity:0}
+.loading-content{position:relative;background-color:#000;width:100%;overflow:hidden;transition:.6s;text-transform:uppercase}
+.loading-content-in{position:relative;width:var(--Lsize);overflow:hidden}
+.loading-content2{position:relative;letter-spacing:2px;text-transform:uppercase;width:var(--Lsize);overflow:hidden;display:flex;justify-content:center;align-items:center;column-gap:10px;text-align:center;transition:1s;max-width:var(--Lsize)}
+.loading-clicked .loading-content2{opacity:0;transition:.5s}
+.loading-content span{font-weight:300;position:absolute;top:50%;right:0;transform:translateY(-50%);opacity:.7}
+.loading-box{position:absolute;right:0;top:50%;transform:translate(100%,-50%);width:15px;height:25px;background-color:white;animation:blink 1s linear infinite}
+@keyframes blink{0%,100%{opacity:0}25%,75%{opacity:1}}
+.loading-button{padding:20px 50px;border-radius:100px;background-color:#000;overflow:hidden;font-size:18px;font-weight:500;position:relative;z-index:9}
+.loading-button::before{content:"";background-color:#fff;top:var(--mouse-y,50%);left:var(--mouse-x,50%);border-radius:50%;width:60px;height:60px;opacity:0;position:absolute;z-index:99;filter:blur(60px);transform:translate(-50%,-50%);transition:opacity .3s}
+.loading-button:hover::before{opacity:1}
+.loading-container{position:absolute;width:100%;max-width:var(--Lsize);top:50%;transition:1s;left:50px;z-index:9;transform:translateY(-50%)}
+.loading-complete .loading-container{max-width:0}
+.loading-icon{transform:scale(0);opacity:0;transition:.5s;transition-delay:.5s}
+.loading-complete .loading-icon{transform:scale(1);opacity:1}
+.loading-clicked .loading-icon{transition-delay:0s;transition:1s;transform:translateX(200px)}
+.loading-clicked .loading-content2>span{transition:1s;transform:translateY(100px);opacity:0}
+
+/* NAV */
+.header{display:flex;max-width:var(--cMaxWidth);width:var(--cWidth);justify-content:space-between;padding:20px 0;margin-bottom:-100px;box-sizing:border-box;position:fixed;left:50%;transform:translateX(-50%);top:0;z-index:9999;opacity:0;transition:opacity .5s}
+.header.vis{opacity:1}
+.navbar-title{font-weight:700;font-size:14px;letter-spacing:.2px}
+.navbar-connect{position:absolute;display:none;left:50%;top:50%;transform:translate(-50%,-50%);font-size:15px;letter-spacing:1px;font-weight:500}
+.header ul{font-size:12px;display:flex;flex-direction:row;margin:0;padding:0;list-style:none;column-gap:40px;row-gap:8px;align-items:center}
+.header ul li{letter-spacing:1px;color:#eae5ec;font-weight:600;cursor:pointer}
+.nav-fade{position:fixed;top:0;width:100%;height:130px;background-image:linear-gradient(0deg,transparent,var(--backgroundColor) 70%);pointer-events:none;z-index:12;opacity:0;left:0;transition:opacity .5s}
+.nav-fade.vis{opacity:1}
+.hover-link-wrap{position:relative;overflow:hidden;display:inline-block;line-height:1.2em}
+.hover-link-top,.hover-link-bot{display:block;transition:transform .3s ease}
+.hover-link-bot{position:absolute;top:100%;left:0}
+.header ul li:hover .hover-link-top{transform:translateY(-100%)}
+.header ul li:hover .hover-link-bot{transform:translateY(-100%)}
+
+/* ORBS */
+.landing-circle1{top:0;left:0;z-index:15;position:fixed;width:300px;height:300px;background-color:#fb8dff;box-shadow:inset -50px 40px 50px rgba(84,0,255,.6);filter:blur(60px);border-radius:50%;animation:loadCir 5s linear infinite;pointer-events:none}
+@keyframes loadCir{0%{transform:translate(-95%,-75%) rotateZ(0)}100%{transform:translate(-95%,-75%) rotateZ(360deg)}}
+.landing-circle2{top:50%;right:0;transform:translate(calc(100% - 2px),-50%);z-index:9;position:fixed;width:300px;height:300px;background-color:#fb8dff;box-shadow:inset -50px 40px 50px rgba(84,0,255,.6);filter:blur(50px);border-radius:50%;animation:loadCir2 5s linear infinite;display:none;pointer-events:none}
+@keyframes loadCir2{100%{transform:translate(calc(100% - 2px),-50%) rotate(360deg)}}
+
+/* LANDING */
+.landing-section{width:100%;max-width:var(--cMaxWidth);margin:auto;position:relative;height:var(--vh)}
+.landing-container{width:var(--cWidth);margin:auto;height:100%;position:relative;max-width:var(--cMaxWidth)}
+.landing-intro{position:absolute;z-index:9;top:12%;left:0}
+.landing-intro h2{margin:0;color:var(--accentColor);font-size:22px;font-weight:300;letter-spacing:2px}
+.landing-intro h1{margin:0;letter-spacing:2px;font-size:28px;line-height:28px;font-weight:500}
+.landing-info{position:absolute;right:50%;transform:translateX(50%);bottom:40px;top:inherit;z-index:9}
+.landing-info h3{font-size:22px;letter-spacing:2px;font-weight:300;color:var(--accentColor);margin:0}
+.landing-info h2{margin:0;margin-top:-20px;margin-left:20px;font-weight:600;font-size:32px;line-height:40px;position:relative;display:flex;flex-wrap:nowrap;text-transform:uppercase;letter-spacing:2px;overflow:hidden;height:1.3em}
+.landing-h2-info-1{position:absolute;top:0;left:0}
+h2.landing-info-h2{color:#c481ff;font-size:42px;width:120%;margin:0;font-weight:600;position:relative;margin-left:-5px;overflow:hidden;height:1.15em}
+.landing-h2-2{position:absolute;top:100%;left:0}
+.landing-info-h2::after{content:"";position:absolute;width:100%;height:120%;z-index:3;background-image:linear-gradient(0deg,var(--backgroundColor) 40%,rgba(0,0,0,0) 110%);top:0;left:0}
+
+/* CHARACTER / 3D */
+.character-model{height:80vh;position:absolute;max-width:1920px;max-height:1080px;transform:translateX(-50%);width:100%;left:50%;z-index:0;bottom:50px;pointer-events:inherit}
+.character-model::after{content:"";width:100vw;height:250px;background-image:linear-gradient(to bottom,transparent,var(--backgroundColor) 70%);bottom:-50px;left:50%;transform:translateX(-50%);z-index:9;position:absolute}
+.character-model::before{content:"";width:100vw;height:700px;background-color:var(--backgroundColor);top:100%;left:50%;transform:translateX(-50%);z-index:9;position:absolute}
+.character-rim{position:absolute;width:400px;height:400px;z-index:1;background-color:#f59bf8;box-shadow:inset 66px 35px 85px 0 rgba(85,0,255,.65);filter:blur(50px);border-radius:50%;top:50%;left:50%;transform:translate(-50%,100%) scale(1.4);opacity:0;animation:backlight 3s .5s forwards}
+@keyframes backlight{0%{opacity:0;transform:translate(-50%,100%) scale(1.2)}100%{opacity:.5;transform:translate(-50%,100%) scale(1.4)}}
+#three-canvas{position:absolute;left:50%;bottom:0;transform:translateX(-50%);z-index:2;pointer-events:none}
+
+/* SOCIAL */
+.icons-section{position:fixed;max-width:var(--cMaxWidth);width:var(--cWidth);bottom:0;z-index:99;left:50%;transform:translateX(-50%);opacity:0;transition:opacity .5s}
+.icons-section.vis{opacity:1}
+.social-icons{position:absolute;left:-20px;bottom:20px;display:none;flex-direction:column;gap:8px;z-index:999;padding:10px}
+.social-icons a{--siLeft:50%;--siTop:50%;position:absolute;left:var(--siLeft,50%);top:var(--siTop,50%);transform:translate(-50%,-50%);display:flex;font-size:23px;will-change:left,top;transition:transform .3s ease-out}
+.social-icons span{width:50px;height:50px;position:relative;display:flex}
+.resume-button{position:absolute;z-index:99;display:flex;gap:5px;bottom:40px;right:0;text-wrap:nowrap;letter-spacing:4px;font-size:15px;line-height:15px;font-weight:600;color:#5e5e5e;cursor:pointer;transition:.5s;transform-origin:left bottom;transform:translateX(100%) rotateZ(-90deg);text-decoration:none;align-items:center}
+.resume-button:hover{color:#fff}
+
+/* SECTION CONTAINER */
+.section-container{width:var(--cWidth);max-width:var(--cMaxWidth);margin:auto}
+
+/* WHAT I DO */
+.whatIDO{display:flex;align-items:center;justify-content:center;place-items:center;position:relative;height:100vh;width:var(--cWidth);max-width:1920px;margin:auto;z-index:9}
+.what-box{width:50%;display:flex;justify-content:center;position:relative;z-index:9}
+.what-box h2{font-size:calc(4vw + 25px);line-height:calc(4vw + 20px);font-weight:600;margin-right:10%;margin-bottom:100px}
+.hat-h2{font-style:italic}
+.do-h2{color:var(--accentColor)}
+.what-box-in{flex-direction:column;height:500px;margin-left:200px;position:relative;display:flex}
+.what-content{width:450px;height:33%;min-height:50%;transition:.5s;position:relative;padding:50px;box-sizing:border-box}
+.what-noTouch:hover,.what-content-active{min-height:67%;padding:40px 50px}
+.what-noTouch:hover~.what-content,.what-box-in:hover .what-noTouch:not(:hover),.what-content.what-sibling{min-height:33%;padding:10px 50px}
+.what-content h3{font-size:35px;letter-spacing:1px;margin:0}
+.what-content p{font-size:14px;line-height:18px;font-weight:200;letter-spacing:.7px}
+.what-content h4{font-weight:300;letter-spacing:1px;margin:0;font-size:14px;opacity:.3}
+.what-content-in{opacity:0;animation:wFlick .5s 1 forwards;animation-delay:1s;height:100%;overflow:hidden}
+@keyframes wFlick{0%,25%,35%,60%{opacity:0}30%,50%,40%,100%{opacity:1}}
+.what-content::before,.what-corner::before,.what-content::after,.what-corner::after{content:"";width:10px;height:10px;position:absolute;border:4px solid #fff;opacity:0;animation:wCorn .2s 1 forwards;animation-delay:.5s}
+@keyframes wCorn{100%{opacity:1}}
+.what-content::before{top:-2px;left:-2px;border-right:none;border-bottom:none}
+.what-corner::before{top:-2px;right:-2px;border-left:none;border-bottom:none}
+.what-content::after{bottom:-2px;left:-2px;border-top:none;border-right:none}
+.what-corner::after{bottom:-2px;right:-2px;border-left:none;border-top:none}
+.what-arrow{position:absolute;bottom:20px;right:20px;width:25px;height:25px;border:1px solid #fff}
+.what-arrow::before{content:"";position:absolute;top:40%;left:50%;transform:translate(-50%,-50%) rotate(-45deg);border-left:1px solid #fff;border-bottom:1px solid #fff;transition:.5s;width:10px;height:10px}
+.what-noTouch:hover .what-arrow::before,.what-content-active .what-arrow::before{transform:translate(-50%,-20%) rotate(-225deg)}
+.what-border1{position:absolute;top:0;width:100%;left:50%;transform:translateX(-50%);height:100%;transition:.5s;max-width:0;overflow:hidden;opacity:.8;animation:wBord 1.2s 1 forwards}
+.what-border1 svg{position:absolute;left:50%;transform:translateX(-50%);width:450px}
+.what-border2{position:absolute;top:50%;width:100%;left:0;transform:translateY(-50%);height:100%;max-height:0;overflow:hidden;transition:.5s;opacity:.8;animation:wBord 1.2s 1 forwards}
+.what-border2 svg{height:500px;top:50%;transform:translateY(-50%);position:absolute}
+.what-content-in h5{font-weight:300;opacity:.5;font-size:12px;letter-spacing:1px;margin-bottom:5px}
+@keyframes wBord{80%{opacity:.8}100%{max-height:100%;max-width:100%;opacity:.2}}
+.what-content-flex{display:flex;gap:5px;flex-wrap:wrap}
+.what-tags{font-size:13px;font-weight:400;padding:2px 7px;background-color:rgba(255,255,255,.15);border:1px solid #ffffff50;border-radius:30px}
+
+/* CAREER */
+.career-section{display:flex;flex-direction:column;align-items:center;place-items:center;justify-content:center;position:relative;height:auto;margin:auto;margin-bottom:250px;padding:120px 0}
+.career-section h2{font-size:70px;line-height:70px;font-weight:400;text-align:center;background:linear-gradient(0deg,#7f40ff,#ffffff);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;color:transparent;margin-top:50px;margin-bottom:90px}
+.career-section h2>span{font-weight:300}
+.career-info{position:relative;display:flex;flex-direction:column;margin:0 auto}
+.career-info-box{display:flex;justify-content:space-between;margin-bottom:50px}
+.career-info-box p{width:40%;font-size:18px;font-weight:300;margin:0}
+.career-info-in{display:flex;width:40%;justify-content:space-between;gap:50px}
+.career-info h3{font-size:48px;margin:0;font-weight:500;line-height:45px}
+.career-info h4{font-size:33px;line-height:30px;letter-spacing:.8px;font-weight:500;margin:0}
+.career-info h5{font-weight:400;letter-spacing:.7px;font-size:20px;text-transform:capitalize;margin:10px 0;color:var(--accentColor)}
+.career-timeline{position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:3px;height:100%;background-image:linear-gradient(to top,#aa42ff 20%,var(--accentColor) 50%,transparent 95%);max-height:0}
+.career-dot{position:absolute;bottom:0;left:50%;transform:translate(-50%,50%);background-color:#aa42ff;width:10px;height:10px;border-radius:50px;box-shadow:0 0 5px 2px #d29bff,0 0 15px 8px #d097ff,0 0 110px 20px #f2c0ff;animation:tlAnim .8s linear infinite}
+@keyframes tlAnim{10%,20%,50%,70%,90%{box-shadow:0 0 5px 2px #d29bff}0%,30%,64%,80%,100%{box-shadow:0 0 5px 2px #d29bff,0 0 15px 5px #d097ff,0 0 110px 20px #f2c0ff}}
+
+/* WORK */
+.work-section{overflow:hidden;width:100%;position:relative}
+.work-container{padding:50px 0;position:relative}
+.work-container>h2{font-size:70px;line-height:70px;font-weight:400;margin-bottom:50px}
+.work-container>h2>span{color:var(--accentColor)}
+.work-flex{display:flex;gap:30px;will-change:transform}
+.work-box{min-width:400px;width:400px;border:1px solid rgba(255,255,255,.12);border-radius:4px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,.02);transition:border-color .3s}
+.work-box:hover{border-color:rgba(194,164,255,.4)}
+.work-info{padding:25px 25px 20px}
+.work-title{display:flex;align-items:flex-start;gap:15px;margin-bottom:15px}
+.work-title h3{font-size:40px;font-weight:500;color:var(--accentColor);line-height:1;margin:0;opacity:.3}
+.work-title h4{font-size:20px;font-weight:600;margin:0}
+.work-title p{font-size:13px;font-weight:300;color:#888;margin:5px 0 0;letter-spacing:.5px}
+.work-info>h4{font-size:12px;font-weight:400;opacity:.4;letter-spacing:1px;text-transform:uppercase;margin:0 0 5px}
+.work-info>p{font-size:13px;font-weight:300;color:#aaa;margin:0}
+.work-image{width:100%;aspect-ratio:16/9;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}
+.work-image-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 60%,rgba(0,0,0,.6))}
+.work-image-tag{position:absolute;bottom:12px;right:12px;background:rgba(194,164,255,.15);border:1px solid rgba(194,164,255,.3);border-radius:100px;padding:3px 10px;font-size:11px;color:var(--accentColor);letter-spacing:1px}
+.work-image-live{position:absolute;top:12px;right:12px;background:rgba(0,255,150,.1);border:1px solid rgba(0,255,150,.3);border-radius:100px;padding:3px 10px;font-size:11px;color:#00ff96;letter-spacing:1px;display:flex;align-items:center;gap:5px}
+.live-dot{width:5px;height:5px;background:#00ff96;border-radius:50%;animation:lp 1.5s infinite}
+@keyframes lp{0%,100%{opacity:1}50%{opacity:.3}}
+.work-preview-canvas{width:100%;height:100%}
+
+/* ABOUT */
+.about-section{display:flex;flex-direction:column;padding:120px 0;position:relative;margin:auto}
+.about-section h2{font-size:70px;line-height:70px;font-weight:400;background:linear-gradient(0deg,#7f40ff,#ffffff);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:60px}
+.about-section h2 span{font-style:italic}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.about-text p{font-size:18px;font-weight:300;line-height:1.7;color:rgba(234,229,236,.7);margin-bottom:20px}
+.about-text p strong{color:#fff;font-weight:500}
+.about-text p .acc{color:var(--accentColor)}
+.about-scores{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.about-score{padding:6px 16px;border-radius:100px;border:1px solid rgba(194,164,255,.3);font-size:13px;color:var(--accentColor);background:rgba(194,164,255,.05)}
+.about-cert{border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:20px 25px;margin-bottom:15px;transition:border-color .3s}
+.about-cert:hover{border-color:rgba(194,164,255,.3)}
+.about-cert h5{font-size:11px;font-weight:400;opacity:.4;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.about-cert h4{font-size:16px;font-weight:500;margin:0 0 4px}
+.about-cert p{font-size:13px;font-weight:300;opacity:.6;margin:0}
+
+/* CONTACT */
+.contact-section{margin:auto;padding-bottom:100px;margin-top:100px}
+.contact-section h3{font-size:60px;font-weight:400;text-transform:uppercase;margin:0}
+.contact-flex{display:flex;justify-content:space-between;margin-top:40px}
+.contact-flex h4{font-weight:500;margin:0;opacity:.6}
+.contact-box{display:flex;flex-direction:column}
+.contact-flex p{margin-top:10px;margin-bottom:20px}
+a.contact-social{font-size:25px;border-bottom:1px solid rgba(255,255,255,.3);display:flex;align-items:center;gap:6px;padding:6px 0;transition:border-color .3s}
+a.contact-social:hover{border-color:var(--accentColor)}
+.contact-box h2{font-weight:400;font-size:23px;margin:0}
+.contact-box h2>span{color:var(--accentColor)}
+.contact-box h5{font-size:20px;font-weight:500;line-height:20px;display:flex;gap:10px;opacity:.5;margin:0;margin-top:10px}
+
+/* SMOOTH SCROLL */
+#smooth-wrapper{overflow:hidden}
+
+/* RESPONSIVE */
+@media(min-width:500px){.landing-circle2{display:block}.landing-intro h2{font-size:18px}.landing-intro h1{font-size:30px;line-height:30px}.landing-info h3{font-size:18px}.landing-info h2{font-size:35px;line-height:40px}h2.landing-info-h2{font-size:38px}}
+@media(min-width:768px){body{--cWidth:94%}.character-model{height:80vh}.landing-intro h2{font-size:25px}.landing-intro h1{font-size:40px;line-height:35px}.landing-info h3{font-size:25px}.landing-info h2{font-size:45px;line-height:42px}h2.landing-info-h2{font-size:55px}.resume-button{transform:none;font-size:20px;line-height:20px}.navbar-connect{display:block}}
+@media(min-width:900px){.social-icons{display:flex;gap:20px}.social-icons a{font-size:28px}}
+@media(min-width:1025px){.character-model{height:100vh;bottom:0;z-index:11;position:fixed}.character-model::after,.character-model::before{display:none}.landing-intro{top:50%;left:auto;right:66%;transform:translate(0,-50%)}.landing-info{bottom:auto;top:51%;z-index:inherit;text-align:left;transform:translate(0,-50%);right:auto;left:66%}}
+@media(min-width:1200px){.header ul{column-gap:80px;font-size:16px}.navbar-connect{font-size:16px}.navbar-title{font-size:18px}.header{padding:35px 0}.landing-intro{right:70%}.landing-info{left:70%}}
+@media(min-width:1400px){.loading-wrap{--Lsize:210px}.loading-button{padding:30px 70px;font-size:25px}.loading-container{left:70px}.loading-marquee{font-size:100px}}
+@media(min-width:1600px){.landing-intro h2{font-size:35px}.landing-intro h1{font-size:60px;line-height:55px}.landing-info h3{font-size:35px}.landing-info h2{font-size:65px;line-height:62px}h2.landing-info-h2{font-size:75px}}
+@media(max-width:1400px){.career-section h2{font-size:50px;line-height:50px}.career-info h4{font-size:22px;line-height:24px;width:180px}.career-info h5{font-size:17px}.career-info h3{font-size:40px}.career-info-box p{font-size:14px}.career-info-in{width:45%;gap:20px}.career-info-box p{width:45%}.what-box-in{margin-left:50px}.what-content{width:380px}}
+@media(max-width:1025px){.career-section{padding:70px 0;padding-top:220px;margin-top:-200px;margin-bottom:0}}
+@media(max-width:900px){.career-info-box{flex-direction:column;gap:10px;margin-bottom:70px}.career-info-in,.career-info-box p{width:100%;padding-left:10%;box-sizing:border-box}.career-timeline{left:0}.career-container{width:calc(100% - 25px)}.contact-flex{flex-direction:column;gap:40px}.contact-section{margin-top:50px;padding-bottom:50px}.what-box h2{margin:50px 0;font-size:55px;line-height:53px}.whatIDO{flex-direction:column}.what-box{width:500px;max-width:calc(100% - 50px);margin:auto}.what-content{width:100%}.what-box-in{margin-left:0;height:450px}.what-box:last-child{height:500px}.about-grid{grid-template-columns:1fr;gap:40px}.about-section h2{font-size:45px;line-height:48px}}
+@media(max-width:600px){.career-info{margin:0}.career-section h2{width:100%;font-size:45px;line-height:45px;margin-top:0}.career-info-in{gap:0}.career-info h3{font-size:33px}.career-info-in,.career-info-box p{padding-left:5%}.career-section{padding-top:90px;margin-top:-70px;align-items:start;place-items:inherit}.contact-container{width:calc(100% - 25px)}}
+</style>
+</head>
+<body>
+
+<div class="cursor-main" id="cursorEl"></div>
+
+<!-- LOADING SCREEN -->
+<div id="loading-screen">
+  <div class="loading-header">
+    <span class="loader-title" data-cursor="disable">ARS</span>
+    <div class="loaderGame" id="loaderGame">
+      <div class="loaderGame-container">
+        <div class="loaderGame-in" id="loaderGameIn"></div>
+        <div class="loaderGame-ball"></div>
+      </div>
+    </div>
+  </div>
+  <div class="loading-marquee">
+    <div class="marquee-track" id="marqueeTrack"></div>
+  </div>
+  <div class="loading-wrap" id="loadingWrap">
+    <div class="loading-hover" id="loadingHover"></div>
+    <div class="loading-button" id="loadingButton">
+      <div class="loading-container">
+        <div class="loading-content">
+          <div class="loading-content-in">Loading <span id="loadPercent">0%</span></div>
+        </div>
+        <div class="loading-box"></div>
+      </div>
+      <div class="loading-content2"><span>Welcome</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ORBS + NAV FADE -->
+<div class="landing-circle1"></div>
+<div class="landing-circle2"></div>
+<div class="nav-fade" id="navFade"></div>
+
+<!-- FIXED NAV -->
+<div class="header" id="mainHeader">
+  <a href="#" class="navbar-title" data-cursor="disable">ARS</a>
+  <a href="mailto:aliraza.syed2007@gmail.com" class="navbar-connect" data-cursor="disable">aliraza.syed2007@gmail.com</a>
+  <ul>
+    <li><a href="#about"><span class="hover-link-wrap"><span class="hover-link-top">ABOUT</span><span class="hover-link-bot">ABOUT</span></span></a></li>
+    <li><a href="#work"><span class="hover-link-wrap"><span class="hover-link-top">WORK</span><span class="hover-link-bot">WORK</span></span></a></li>
+    <li><a href="#contact"><span class="hover-link-wrap"><span class="hover-link-top">CONTACT</span><span class="hover-link-bot">CONTACT</span></span></a></li>
+  </ul>
+</div>
+
+<!-- FIXED SOCIAL -->
+<div class="icons-section" id="iconsSection">
+  <div class="social-icons" data-cursor="icons" id="socialIcons">
+    <span>
+      <a href="https://github.com/aliraza-987" target="_blank" rel="noopener">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+      </a>
+    </span>
+    <span>
+      <a href="https://linkedin.com/in/-ali-raza-syed987" target="_blank" rel="noopener">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
+    </span>
+  </div>
+  <a class="resume-button" href="mailto:aliraza.syed2007@gmail.com" data-cursor="disable">
+    CONTACT
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+  </a>
+</div>
+
+<!-- PAGE CONTENT -->
+<div id="smooth-wrapper">
+<div id="smooth-content">
+
+<!-- LANDING -->
+<div class="landing-section" id="landingDiv">
+  <div class="landing-container">
+    <div class="landing-intro">
+      <h2>Hello! I'm</h2>
+      <h1>ALI RAZA<br><span>SYED.</span></h1>
+    </div>
+    <div class="landing-info">
+      <h3>An Ambitious</h3>
+      <h2 class="landing-info-h2">
+        <div class="landing-h2-1">Builder</div>
+        <div class="landing-h2-2">Researcher</div>
+      </h2>
+      <h2>
+        <div class="landing-h2-info">Researcher</div>
+        <div class="landing-h2-info-1">Builder</div>
+      </h2>
+    </div>
+  </div>
+  <div class="character-model" id="characterModel">
+    <div class="character-rim"></div>
+    <canvas id="three-canvas"></canvas>
+  </div>
+</div>
+
+<!-- WHAT I DO -->
+<div class="whatIDO">
+  <div class="what-box">
+    <h2>W<span class="hat-h2">HAT</span><div>I<span class="do-h2"> DO</span></div></h2>
+  </div>
+  <div class="what-box">
+    <div class="what-box-in">
+      <div class="what-border2">
+        <svg width="100%">
+          <line x1="0" y1="0" x2="0" y2="100%" stroke="white" stroke-width="2" stroke-dasharray="7,7"/>
+          <line x1="100%" y1="0" x2="100%" y2="100%" stroke="white" stroke-width="2" stroke-dasharray="7,7"/>
+        </svg>
+      </div>
+      <div class="what-content what-noTouch" id="wc1">
+        <div class="what-border1">
+          <svg height="100%">
+            <line x1="0" y1="0" x2="100%" y2="0" stroke="white" stroke-width="2" stroke-dasharray="6,6"/>
+            <line x1="0" y1="100%" x2="100%" y2="100%" stroke="white" stroke-width="2" stroke-dasharray="6,6"/>
+          </svg>
+        </div>
+        <div class="what-corner"></div>
+        <div class="what-content-in">
+          <h3>BUILD</h3>
+          <h4>Full-Stack AI Engineering</h4>
+          <p>I build end-to-end AI-powered products — from model training to live deployment. I turn ideas into real tools that real users actually use.</p>
+          <h5>Skillset &amp; tools</h5>
+          <div class="what-content-flex">
+            <div class="what-tags">Python</div><div class="what-tags">Flask</div>
+            <div class="what-tags">Groq API</div><div class="what-tags">SQLite</div>
+            <div class="what-tags">TensorFlow</div><div class="what-tags">Scikit-Learn</div>
+            <div class="what-tags">XGBoost</div><div class="what-tags">REST APIs</div>
+            <div class="what-tags">Render</div><div class="what-tags">Git</div>
+          </div>
+          <div class="what-arrow"></div>
+        </div>
+      </div>
+      <div class="what-content what-noTouch" id="wc2">
+        <div class="what-border1">
+          <svg height="100%">
+            <line x1="0" y1="100%" x2="100%" y2="100%" stroke="white" stroke-width="2" stroke-dasharray="6,6"/>
+          </svg>
+        </div>
+        <div class="what-corner"></div>
+        <div class="what-content-in">
+          <h3>RESEARCH</h3>
+          <h4>AI & Machine Learning</h4>
+          <p>I study how models learn, why they fail, and how to make AI accessible for people who don't already have everything.</p>
+          <h5>Skillset &amp; tools</h5>
+          <div class="what-content-flex">
+            <div class="what-tags">Deep Learning</div><div class="what-tags">NLP</div>
+            <div class="what-tags">TF-IDF</div><div class="what-tags">Foundation Models</div>
+            <div class="what-tags">Pandas</div><div class="what-tags">NumPy</div>
+            <div class="what-tags">Matplotlib</div><div class="what-tags">Data Analysis</div>
+          </div>
+          <div class="what-arrow"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDUCATION / CAREER -->
+<div class="career-section section-container" id="about">
+  <div class="career-container">
+    <h2>My education <span>&</span><br>journey</h2>
+    <div class="career-info">
+      <div class="career-timeline" id="careerTimeline"><div class="career-dot"></div></div>
+      <div class="career-info-box">
+        <div class="career-info-in">
+          <div class="career-role">
+            <h4>Grade 10 Board Exams</h4>
+            <h5>St. Gregorios High School</h5>
+          </div>
+          <h3>2023</h3>
+        </div>
+        <p>Achieved 92.33% overall — 99/100 English, 96/100 Mathematics, 92/100 Computer Science. Certificate of Excellence, recognised by MLA Abu Asim Azmi with award and tablet.</p>
+      </div>
+      <div class="career-info-box">
+        <div class="career-info-in">
+          <div class="career-role">
+            <h4>Self-Taught AI Engineer</h4>
+            <h5>Independent / GitHub</h5>
+          </div>
+          <h3>2024</h3>
+        </div>
+        <p>Taught myself Python, Flask, and ML entirely outside school. Built 6 real ML projects on GitHub — sentiment analysis, fraud detection, healthcare models. 99-hour Udemy Deep Learning bootcamp.</p>
+      </div>
+      <div class="career-info-box">
+        <div class="career-info-in">
+          <div class="career-role">
+            <h4>Grade 12 — Founder & Builder</h4>
+            <h5>AFAC Junior College</h5>
+          </div>
+          <h3>NOW</h3>
+        </div>
+        <p>Predicted 99/100 Maths, 98/100 IT, 90%+ overall. Built and launched InterviewIQ live — AI mock interview platform with 500+ sessions from real users. Applying to top global AI programs.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WORK / PROJECTS -->
+<div class="work-section" id="work">
+  <div class="work-container section-container">
+    <h2>My <span>Work</span></h2>
+    <div class="work-flex" id="workFlex">
+      <div class="work-box">
+        <div class="work-info">
+          <div class="work-title"><h3>01</h3><div><h4>InterviewIQ</h4><p>AI Mock Interview Platform</p></div></div>
+          <h4>Stack &amp; Features</h4>
+          <p>Python, Flask, Groq LLM (llama-3.3-70b), SQLite, SSE Streaming, Web Speech API</p>
+        </div>
+        <div class="work-image">
+          <canvas class="work-preview-canvas" id="prev1"></canvas>
+          <div class="work-image-overlay"></div>
+          <div class="work-image-live"><span class="live-dot"></span>LIVE</div>
+          <div class="work-image-tag">Full-Stack AI</div>
+        </div>
+      </div>
+      <div class="work-box">
+        <div class="work-info">
+          <div class="work-title"><h3>02</h3><div><h4>Diabetes Predictor</h4><p>Healthcare ML Classification</p></div></div>
+          <h4>Stack &amp; Features</h4>
+          <p>Python, NumPy, Pandas, Scikit-Learn, Cross-Validation, Feature Engineering</p>
+        </div>
+        <div class="work-image">
+          <canvas class="work-preview-canvas" id="prev2"></canvas>
+          <div class="work-image-overlay"></div>
+          <div class="work-image-tag">Healthcare ML</div>
+        </div>
+      </div>
+      <div class="work-box">
+        <div class="work-info">
+          <div class="work-title"><h3>03</h3><div><h4>Fake News Detector</h4><p>NLP Text Classification</p></div></div>
+          <h4>Stack &amp; Features</h4>
+          <p>Python, NLP, TF-IDF Vectorization, Scikit-Learn, Pandas, Binary Classifier</p>
+        </div>
+        <div class="work-image">
+          <canvas class="work-preview-canvas" id="prev3"></canvas>
+          <div class="work-image-overlay"></div>
+          <div class="work-image-tag">NLP</div>
+        </div>
+      </div>
+      <div class="work-box">
+        <div class="work-info">
+          <div class="work-title"><h3>04</h3><div><h4>Sentiment Analysis</h4><p>NLP &amp; Opinion Mining</p></div></div>
+          <h4>Stack &amp; Features</h4>
+          <p>Python, NLP, Text Preprocessing, Scikit-Learn, Sentiment Classification Pipeline</p>
+        </div>
+        <div class="work-image">
+          <canvas class="work-preview-canvas" id="prev4"></canvas>
+          <div class="work-image-overlay"></div>
+          <div class="work-image-tag">NLP</div>
+        </div>
+      </div>
+      <div class="work-box">
+        <div class="work-info">
+          <div class="work-title"><h3>05</h3><div><h4>Fraud Detection</h4><p>Financial ML — Credit Card</p></div></div>
+          <h4>Stack &amp; Features</h4>
+          <p>Python, XGBoost, Imbalanced Data Handling, SMOTE, ROC-AUC Evaluation</p>
+        </div>
+        <div class="work-image">
+          <canvas class="work-preview-canvas" id="prev5"></canvas>
+          <div class="work-image-overlay"></div>
+          <div class="work-image-tag">FinML</div>
+        </div>
+      </div>
+      <div class="work-box">
+        <div class="work-info">
+          <div class="work-title"><h3>06</h3><div><h4>Rock vs Mine</h4><p>Sonar Signal Classifier</p></div></div>
+          <h4>Stack &amp; Features</h4>
+          <p>Python, Logistic Regression, NumPy, Pandas, Signal Data Preprocessing</p>
+        </div>
+        <div class="work-image">
+          <canvas class="work-preview-canvas" id="prev6"></canvas>
+          <div class="work-image-overlay"></div>
+          <div class="work-image-tag">Classification</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="about-section section-container">
+  <h2>About <span>me.</span></h2>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>I'm <strong>Ali Raza Syed</strong>, 18, from <span class="acc">Mumbai</span>. I'm finishing Grade 12 with predicted scores of <span class="acc">99/100 Maths</span> and <span class="acc">98/100 IT</span>. I started teaching myself Python and HTML outside school simply because I wanted to build things.</p>
+      <p>The project I care most about is <strong>InterviewIQ</strong> — a full-stack AI mock interview platform I built entirely from scratch. It's live, being used by real people, and still being improved. Real users break systems in ways you didn't think to plan for.</p>
+      <p>Beyond code, I led ground operations for a charity event that fed <span class="acc">1,000+ people</span> — managing materials, cooks, and volunteers. Caring about something and executing it are completely different skills, and I work on both.</p>
+      <p>I want to work on AI that makes technology useful for people without obvious access to it. I grew up in Mumbai — I've seen what it looks like when good tools only reach people who already have everything. That gap bothers me.</p>
+      <div class="about-scores">
+        <span class="about-score">Maths — 99/100</span>
+        <span class="about-score">IT — 98/100</span>
+        <span class="about-score">English — 99/100</span>
+        <span class="about-score">6 GitHub Projects</span>
+        <span class="about-score">500+ Live Users</span>
+        <span class="about-score">$0 Infra Cost</span>
+      </div>
+    </div>
+    <div>
+      <div class="about-cert">
+        <h5>Certification</h5>
+        <h4>Complete DS, ML, DL &amp; NLP Bootcamp</h4>
+        <p>Udemy — Krish Naik, KRISHAI Technologies — 99 hours — Completed Feb 2026</p>
+      </div>
+      <div class="about-cert">
+        <h5>Award</h5>
+        <h4>MLA Award — Abu Asim Azmi</h4>
+        <p>Recognised with certificate, award and tablet for academic excellence in Grade 10 boards</p>
+      </div>
+      <div class="about-cert">
+        <h5>Achievement</h5>
+        <h4>Certificate of Excellence</h4>
+        <p>Highest grades in English 99/100 and Mathematics 96/100 — St. Gregorios High School</p>
+      </div>
+      <div class="about-cert">
+        <h5>Leadership</h5>
+        <h4>Charity Operations Lead</h4>
+        <p>Led full ground operations — food provided to 1,000+ people, managed materials, cooks and volunteers</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<div class="contact-section section-container" id="contact">
+  <h3>Contact</h3>
+  <div class="contact-flex">
+    <div class="contact-box">
+      <h4>Email</h4>
+      <p><a href="mailto:aliraza.syed2007@gmail.com" data-cursor="disable">aliraza.syed2007@gmail.com</a></p>
+      <h4>Phone</h4>
+      <p><a href="tel:+919594279786" data-cursor="disable">+91 9594279786</a></p>
+    </div>
+    <div class="contact-box">
+      <h4>Social</h4>
+      <a href="https://github.com/aliraza-987" target="_blank" data-cursor="disable" class="contact-social">
+        Github <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </a>
+      <a href="https://linkedin.com/in/-ali-raza-syed987" target="_blank" data-cursor="disable" class="contact-social">
+        LinkedIn <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </a>
+      <a href="https://interviewiq-83bs.onrender.com" target="_blank" data-cursor="disable" class="contact-social">
+        InterviewIQ — Live <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </a>
+    </div>
+    <div class="contact-box">
+      <h2>Built and designed<br>by <span>Ali Raza Syed</span></h2>
+      <h5>&copy; 2026</h5>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<script>
+// ─── LOADING ──────────────────────────────────────────────
+(function(){
+  const gi=document.getElementById('loaderGameIn');
+  for(let i=0;i<27;i++){const d=document.createElement('div');d.className='loaderGame-line';gi.appendChild(d);}
+  const mt=document.getElementById('marqueeTrack');
+  const words=[' An AI Builder','An AI Researcher','A Mumbai Founder','Building Real Things'];
+  let full='';
+  for(let r=0;r<3;r++) words.forEach(w=>{ full+=`<span>${w}</span>`; });
+  mt.innerHTML=full+full;
+
+  let pct=0;
+  const pEl=document.getElementById('loadPercent');
+  const btn=document.getElementById('loadingButton');
+  const wrap=document.getElementById('loadingWrap');
+
+  function tick(){
+    if(pct<50) pct+=Math.round(Math.random()*5);
+    else if(pct<92) pct+=Math.round(Math.random()*2);
+    if(pct>92)pct=92;
+    pEl.textContent=pct+'%';
+    if(pct<92)setTimeout(tick,100);
+  }
+  tick();
+
+  wrap.addEventListener('mousemove',e=>{
+    const r=wrap.getBoundingClientRect();
+    wrap.style.setProperty('--mouse-x',(e.clientX-r.left)+'px');
+    wrap.style.setProperty('--mouse-y',(e.clientY-r.top)+'px');
+    btn.style.setProperty('--mouse-x',(e.clientX-r.left)+'px');
+    btn.style.setProperty('--mouse-y',(e.clientY-r.top)+'px');
+  });
+
+  function enter(){
+    wrap.classList.add('loading-clicked');
+    document.getElementById('loaderGame').classList.add('loader-out');
+    setTimeout(()=>{
+      document.getElementById('loading-screen').style.display='none';
+      ['mainHeader','navFade','iconsSection'].forEach(id=>{
+        document.getElementById(id).classList.add('vis');
+      });
+      document.body.style.overflow='';
+      initAll();
+    },900);
+  }
+
+  setTimeout(()=>{
+    const ci=setInterval(()=>{
+      if(pct<100){pct++;pEl.textContent=pct+'%';}
+      else{clearInterval(ci);btn.classList.add('loading-complete');setTimeout(enter,800);}
+    },15);
+  },2000);
+
+  wrap.addEventListener('click',()=>{ if(pct>=100)enter(); });
+})();
+
+// ─── CURSOR ────────────────────────────────────────────────
+(function(){
+  const cur=document.getElementById('cursorEl');
+  const mp={x:0,y:0},cp={x:0,y:0};
+  let hov=false;
+  document.addEventListener('mousemove',e=>{mp.x=e.clientX;mp.y=e.clientY;});
+  (function loop(){
+    if(!hov){cp.x+=(mp.x-cp.x)/6;cp.y+=(mp.y-cp.y)/6;cur.style.transform=`translate(${cp.x}px,${cp.y}px)`;}
+    requestAnimationFrame(loop);
+  })();
+  document.querySelectorAll('[data-cursor]').forEach(el=>{
+    el.addEventListener('mouseover',e=>{
+      const r=e.currentTarget.getBoundingClientRect();
+      if(el.dataset.cursor==='icons'){cur.classList.add('cursor-icons');cur.style.transform=`translate(${r.left}px,${r.top}px)`;cur.style.setProperty('--cursorH',r.height+'px');hov=true;}
+      if(el.dataset.cursor==='disable')cur.classList.add('cursor-disable');
+    });
+    el.addEventListener('mouseout',()=>{cur.classList.remove('cursor-disable','cursor-icons');hov=false;});
+  });
+})();
+
+// ─── ALL MAIN INITS ────────────────────────────────────────
+function initAll(){
+  initThreeJS();
+  drawPreviews();
+  initWhatIDo();
+  initScrollFX();
+  initMagnets();
+}
+
+// ─── THREE.JS AI NEURAL NET ────────────────────────────────
+function initThreeJS(){
+  const canvas=document.getElementById('three-canvas');
+  const parent=canvas.parentElement;
+  const W=parent.clientWidth,H=parent.clientHeight;
+  canvas.width=W;canvas.height=H;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(W,H);
+
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(60,W/H,0.1,100);
+  camera.position.z=4;
+
+  // Sphere of nodes
+  const N=200;
+  const geo=new THREE.BufferGeometry();
+  const pos=new Float32Array(N*3);
+  const pts3=[];
+  for(let i=0;i<N;i++){
+    const phi=Math.acos(1-2*(i+.5)/N);
+    const theta=Math.PI*(1+Math.sqrt(5))*(i+.5);
+    const r=1.6+(Math.random()-.5)*.7;
+    const x=r*Math.sin(phi)*Math.cos(theta);
+    const y=r*Math.sin(phi)*Math.sin(theta);
+    const z=r*Math.cos(phi);
+    pos[i*3]=x;pos[i*3+1]=y;pos[i*3+2]=z;
+    pts3.push(new THREE.Vector3(x,y,z));
+  }
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const dotMat=new THREE.PointsMaterial({color:0xc2a4ff,size:.055,transparent:true,opacity:.9});
+  scene.add(new THREE.Points(geo,dotMat));
+
+  // Connections
+  const ep=[];
+  for(let i=0;i<N;i++) for(let j=i+1;j<N;j++) if(pts3[i].distanceTo(pts3[j])<0.85) ep.push(pts3[i].x,pts3[i].y,pts3[i].z,pts3[j].x,pts3[j].y,pts3[j].z);
+  const eGeo=new THREE.BufferGeometry();
+  eGeo.setAttribute('position',new THREE.BufferAttribute(new Float32Array(ep),3));
+  const eMat=new THREE.LineBasicMaterial({color:0x7f40ff,transparent:true,opacity:.18});
+  const edgeMesh=new THREE.LineSegments(eGeo,eMat);
+  scene.add(edgeMesh);
+
+  // Core
+  const cGeo=new THREE.SphereGeometry(.3,16,16);
+  const cMat=new THREE.MeshBasicMaterial({color:0xc481ff,transparent:true,opacity:.12,wireframe:true});
+  const coreMesh=new THREE.Mesh(cGeo,cMat);
+  scene.add(coreMesh);
+
+  let mx=0,my=0;
+  document.addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth-.5)*2;my=-(e.clientY/innerHeight-.5)*2;});
+
+  window.addEventListener('resize',()=>{
+    const pw=parent.clientWidth,ph=parent.clientHeight;
+    renderer.setSize(pw,ph);
+    camera.aspect=pw/ph;camera.updateProjectionMatrix();
+  });
+
+  let t=0;
+  (function anim(){
+    requestAnimationFrame(anim);
+    t+=.004;
+    const g=scene.children[0];
+    g.rotation.y=t*.3+mx*.2;g.rotation.x=my*.15;
+    edgeMesh.rotation.y=t*.3+mx*.2;edgeMesh.rotation.x=my*.15;
+    coreMesh.rotation.y=-t*.5;
+    eMat.opacity=.12+Math.sin(t*2)*.05;
+    renderer.render(scene,camera);
+  })();
+}
+
+// ─── WORK PREVIEW CANVASES ─────────────────────────────────
+function drawPreviews(){
+  const cfgs=[
+    {id:'prev1',c1:'#12051f',c2:'#060d1a',ac:'#c2a4ff',t:'chat'},
+    {id:'prev2',c1:'#051f0f',c2:'#031208',ac:'#4ade80',t:'scatter'},
+    {id:'prev3',c1:'#1f0a05',c2:'#150500',ac:'#fb923c',t:'bars'},
+    {id:'prev4',c1:'#050f1f',c2:'#020a14',ac:'#60a5fa',t:'wave'},
+    {id:'prev5',c1:'#1f0505',c2:'#110000',ac:'#f87171',t:'pie'},
+    {id:'prev6',c1:'#111105',c2:'#0a0a00',ac:'#facc15',t:'signal'},
+  ];
+  cfgs.forEach(c=>{
+    const el=document.getElementById(c.id);
+    if(!el)return;
+    const W=el.clientWidth||400,H=el.clientHeight||225;
+    el.width=W;el.height=H;
+    const ctx=el.getContext('2d');
+    const bg=ctx.createLinearGradient(0,0,W,H);
+    bg.addColorStop(0,c.c1);bg.addColorStop(1,c.c2);
+    ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle=c.ac;ctx.fillStyle=c.ac;
+    if(c.t==='chat'){
+      [[.08,.15,.52,.09,'l'],[.3,.35,.46,.09,'r'],[.08,.55,.56,.09,'l'],[.38,.73,.42,.09,'r']].forEach(([x,y,w,h,s])=>{
+        const bx=s==='r'?W*(1-x-w):W*x;
+        ctx.globalAlpha=.22;ctx.fillStyle=c.ac;
+        ctx.beginPath();ctx.roundRect(bx,H*y,W*w,H*h,5);ctx.fill();
+      });
+      ctx.globalAlpha=.6;ctx.fillStyle=c.ac;ctx.fillRect(W*.13,H*.86,2,H*.08);
+    }else if(c.t==='scatter'){
+      ctx.globalAlpha=.65;
+      for(let i=0;i<45;i++){
+        const x=25+Math.random()*(W-50),y=15+Math.random()*(H-30);
+        ctx.beginPath();ctx.arc(x,y,2.5+Math.random()*3,0,Math.PI*2);
+        ctx.fillStyle=Math.random()>.5?c.ac:'#60a5fa';ctx.fill();
+      }
+    }else if(c.t==='bars'){
+      [.35,.65,.48,.82,.55,.72,.4,.88,.6].forEach((v,i)=>{
+        const bw=(W-60)/9,bh=(H-50)*v;
+        ctx.globalAlpha=.45+v*.4;ctx.fillStyle=c.ac;
+        ctx.fillRect(30+i*bw+3,H-25-bh,bw-6,bh);
+      });
+    }else if(c.t==='wave'){
+      ctx.globalAlpha=.65;ctx.lineWidth=2;
+      ctx.beginPath();
+      for(let x=0;x<W;x++){const y=H/2+Math.sin(x*.04)*40+Math.sin(x*.02)*25;x?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+      ctx.strokeStyle=c.ac;ctx.stroke();
+      ctx.beginPath();
+      for(let x=0;x<W;x++){const y=H/2+Math.sin(x*.04+1.5)*28+Math.sin(x*.015)*18;x?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+      ctx.strokeStyle='#818cf8';ctx.stroke();
+    }else if(c.t==='pie'){
+      const cx=W/2,cy=H/2,r=Math.min(W,H)*.3;
+      [[.62,c.ac],[.24,'#fca5a5'],[.14,'#374151']].reduce((s,[p,col])=>{
+        const e=s+Math.PI*2*p;
+        ctx.globalAlpha=.72;ctx.fillStyle=col;
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,s,e);ctx.closePath();ctx.fill();
+        return e;
+      },-Math.PI/2);
+    }else if(c.t==='signal'){
+      ctx.globalAlpha=.72;ctx.lineWidth=2;ctx.beginPath();
+      for(let x=0;x<W;x++){const y=H/2+(Math.random()-.5)*55*Math.abs(Math.sin(x*.06));x?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+      ctx.strokeStyle=c.ac;ctx.stroke();
+      ctx.globalAlpha=.25;ctx.lineWidth=1;ctx.setLineDash([5,5]);
+      ctx.beginPath();ctx.moveTo(0,H*.33);ctx.lineTo(W,H*.33);ctx.strokeStyle='#fff';ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    ctx.globalAlpha=1;
+  });
+}
+
+// ─── WHAT I DO INTERACTION ─────────────────────────────────
+function initWhatIDo(){
+  document.querySelectorAll('.what-content').forEach(el=>{
+    el.addEventListener('click',()=>{
+      el.classList.toggle('what-content-active');
+      el.classList.remove('what-sibling');
+      Array.from(el.parentElement.children).forEach(s=>{
+        if(s!==el&&s.classList.contains('what-content')){
+          s.classList.remove('what-content-active');
+          s.classList.add('what-sibling');
+        }
+      });
+    });
+  });
+}
+
+// ─── SCROLL FX ─────────────────────────────────────────────
+function initScrollFX(){
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Timeline grow
+  const tl=document.getElementById('careerTimeline');
+  if(tl) gsap.to(tl,{maxHeight:'100%',ease:'none',scrollTrigger:{trigger:'.career-section',start:'top 80%',end:'bottom 30%',scrub:true}});
+
+  // Role flip on landing
+  const r1=document.querySelector('.landing-h2-1');
+  const r2=document.querySelector('.landing-h2-2');
+  const i1=document.querySelector('.landing-h2-info');
+  const i2=document.querySelector('.landing-h2-info-1');
+  if(r1&&r2){
+    gsap.timeline({repeat:-1,repeatDelay:1.5})
+      .to([r1,i1],{y:'-100%',duration:.5,delay:2.5,ease:'power2.in'})
+      .fromTo([r2,i2],{y:'100%'},{y:'0%',duration:.5,ease:'power2.out'},'<')
+      .to([r2,i2],{y:'-100%',duration:.5,delay:2.5,ease:'power2.in'})
+      .fromTo([r1,i1],{y:'100%'},{y:'0%',duration:.5,ease:'power2.out'},'<');
+  }
+
+  // Horizontal scroll work
+  setTimeout(()=>{
+    const wf=document.getElementById('workFlex');
+    if(!wf)return;
+    const boxes=wf.querySelectorAll('.work-box');
+    let tot=0;
+    boxes.forEach(b=>{tot+=b.offsetWidth+30;});
+    const sd=tot-window.innerWidth+80;
+    if(sd>0){
+      gsap.to(wf,{x:-sd,ease:'none',scrollTrigger:{trigger:'.work-section',start:'top top',end:'+='+sd,scrub:true,pin:true}});
+    }
+  },100);
+
+  // Reveal on scroll
+  document.querySelectorAll('.career-info-box,.about-section,.about-cert,.contact-section h3').forEach((el,i)=>{
+    gsap.fromTo(el,{opacity:0,y:35},{opacity:1,y:0,duration:.8,scrollTrigger:{trigger:el,start:'top 88%',toggleActions:'play none none none'},delay:(i%3)*.12});
+  });
+}
+
+// ─── MAGNETIC SOCIAL ───────────────────────────────────────
+function initMagnets(){
+  const si=document.getElementById('socialIcons');
+  if(!si)return;
+  si.querySelectorAll('span').forEach(item=>{
+    const link=item.querySelector('a');
+    let mx=25,my=25,cx=25,cy=25;
+    (function u(){cx+=(mx-cx)*.1;cy+=(my-cy)*.1;if(link){link.style.setProperty('--siLeft',cx+'px');link.style.setProperty('--siTop',cy+'px');}requestAnimationFrame(u);})();
+    document.addEventListener('mousemove',e=>{
+      const r=item.getBoundingClientRect();
+      const x=e.clientX-r.left,y=e.clientY-r.top;
+      if(x<40&&x>10&&y<40&&y>5){mx=x;my=y;}else{mx=r.width/2;my=r.height/2;}
+    });
+  });
+}
+
+document.body.style.overflow='hidden';
+</script>
+</body>
+</html>
