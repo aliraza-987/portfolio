@@ -170,6 +170,20 @@ h2.landing-info-h2{color:#c481ff;font-size:42px;width:120%;margin:0;font-weight:
 .project-link-btn:hover{background:rgba(194,164,255,.1);color:var(--accentColor)}
 .project-link-btn.dark{color:#eae5ec;border-color:rgba(255,255,255,.15)}
 .project-link-btn.dark:hover{border-color:rgba(194,164,255,.3);color:var(--accentColor)}
+.pitch-section{margin-top:40px;width:100%}
+.pitch-label-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.pitch-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accentColor);opacity:.6}
+.pitch-expand-btn{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--accentColor);border:1px solid rgba(194,164,255,.3);padding:5px 14px;border-radius:100px;cursor:pointer;background:transparent;transition:all .3s;font-family:"Geist",sans-serif}
+.pitch-expand-btn:hover{background:rgba(194,164,255,.1)}
+.pitch-viewer{width:100%;height:600px;border-radius:12px;border:1px solid rgba(255,255,255,.08);overflow:hidden;background:#111;transition:all .4s ease}
+.pitch-viewer iframe{width:100%;height:100%;border:none;display:block}
+.pitch-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:99999;padding:30px;box-sizing:border-box;flex-direction:column;gap:16px}
+.pitch-overlay.active{display:flex}
+.pitch-overlay-header{display:flex;align-items:center;justify-content:space-between}
+.pitch-overlay-title{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--accentColor)}
+.pitch-close-btn{font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#eae5ec;border:1px solid rgba(255,255,255,.2);padding:6px 18px;border-radius:100px;cursor:pointer;background:transparent;transition:all .3s;font-family:"Geist",sans-serif}
+.pitch-close-btn:hover{border-color:var(--accentColor);color:var(--accentColor)}
+.pitch-overlay iframe{width:100%;flex:1;border:none;border-radius:12px;background:#111}
 .project-feature-images{display:flex;flex-direction:column;gap:12px}
 .project-img-main{width:100%;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
 .project-img-main img{width:100%;height:auto;display:block;object-fit:cover}
@@ -377,6 +391,15 @@ a.contact-social:hover{border-color:var(--accentColor)}
         <a href="https://interviewiq-83bs.onrender.com" target="_blank" rel="noopener" class="project-link-btn">&#8599; View Live</a>
         <a href="https://github.com/aliraza-987" target="_blank" rel="noopener" class="project-link-btn dark">GitHub</a>
       </div>
+      <div class="pitch-section">
+        <div class="pitch-label-row">
+          <div class="pitch-label">&#9654; Pitch Deck — InterviewIQ</div>
+          <button class="pitch-expand-btn" onclick="openPitch('pitch/interviewiq.html','InterviewIQ Pitch Deck')">&#x26F6; Expand</button>
+        </div>
+        <div class="pitch-viewer">
+          <iframe src="pitch/interviewiq.html" title="InterviewIQ Pitch Deck"></iframe>
+        </div>
+      </div>
     </div>
     <div class="project-feature-images">
       <div class="project-img-main"><img src="images/interviewiq-home.png" alt="InterviewIQ Homepage"/></div>
@@ -519,6 +542,14 @@ a.contact-social:hover{border-color:var(--accentColor)}
 </div>
 
 </div></div>
+<!-- PITCH OVERLAY -->
+<div class="pitch-overlay" id="pitchOverlay">
+  <div class="pitch-overlay-header">
+    <div class="pitch-overlay-title" id="pitchOverlayTitle"></div>
+    <button class="pitch-close-btn" onclick="closePitch()">&#x2715; Close</button>
+  </div>
+  <iframe id="pitchOverlayFrame" src="" title="Pitch Deck"></iframe>
+</div>
 <script>
 // ─── LOADING ──────────────────────────────────────────────
 (function(){
@@ -819,6 +850,18 @@ function initMagnets(){
 }
 
 document.body.style.overflow='hidden';
+
+function openPitch(src, title){
+  document.getElementById('pitchOverlayFrame').src = src;
+  document.getElementById('pitchOverlayTitle').textContent = title;
+  document.getElementById('pitchOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closePitch(){
+  document.getElementById('pitchOverlay').classList.remove('active');
+  document.getElementById('pitchOverlayFrame').src = '';
+  document.body.style.overflow = '';
+}
 </script>
 </body>
 </html>
